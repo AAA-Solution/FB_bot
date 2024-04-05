@@ -27,6 +27,28 @@ namespace FB_Connector
 
             return res.ToDeserializeCamels<BaseResponse<T>>();
         }
+        public string PostRequestString(string api_url, Dictionary<string, string> header, string data, string token)
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage(HttpMethod.Post, api_url);
+            if (!string.IsNullOrEmpty(token))
+                request.Headers.Add("Authorization", $"Bearer {token}");
+            if (header != null)
+            {
+                foreach (var item in header)
+                {
+                    request.Headers.Add(item.Key, item.Value);
+                }
+            }
+
+            request.Content = new StringContent(data, Encoding.UTF8, "application/json");
+
+            var response = client.SendAsync(request).Result;
+            response.EnsureSuccessStatusCode();
+            var res = response.Content.ReadAsStringAsync().Result;
+
+            return res;
+        }
         public void PostRequest(string api_url, Dictionary<string, string> header, string data, string token)
         {
             var client = new HttpClient();

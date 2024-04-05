@@ -4,5 +4,5 @@ using FB_Connector;
 Console.WriteLine("Hello, World!");
 
 FBService fBService = new FBService();
-var abc = fBService.getFBPosts();
+await fBService.getFBPostsAsync();
 Console.WriteLine("End");

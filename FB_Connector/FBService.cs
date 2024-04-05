@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using Facebook;
 using Common;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace FB_Connector
 {
@@ -54,7 +55,7 @@ namespace FB_Connector
         {
         }
 
-        public List<Posts> getFBPosts()
+        public async Task<List<Posts>> getFBPostsAsync()
         {
             //Facebook.FacebookClient myfacebook = new Facebook.FacebookClient();
             string AppId = "446489094504448";
@@ -67,7 +68,7 @@ namespace FB_Connector
 
             var jsAT = JsonSerializer.Deserialize<AccessToken>(accessToken);
 
-            string _token = "EAAGWFFffwAABO2ZCRZC25cJHMsAO9xWZAKtWMM7lht71DWZBcZAKG18fSETqEwIKwDKfpJKTlVFIATzjydAKognKwCtkn43hbyAHWHEcw5KXhvtsFydRXXhOlTMgGkpUv3mqn4EZAaswtGzVerwdFm2QaWr6dCzZBVo81AaZARqBJ8Gpj6J1KcX9h41utaM88ZCeCcyCMi5Ka6ZBprpGpn7ZB2zyTgZD";
+            string _token = "EAAGWFFffwAABO6gDTFtUEKhs8pKKqxkiaMqSxlSWShHZAaZCe3Hbe6JPCGEaCeLbU1uM22jmOz3pgbSN2ClX8JQ4jvCiDkaRoayJXvu3ZAAnKycUFGnPIxhVKfutdTmOPK134iRQjgJFvvCLvnZCjsCJamawDoD5gJaquMWHhzFrdMWAk1ZBydyB96ZCrhvsWbTVVhHZAyPP4k1tEV0UWcjsWEZD";
             FacebookClient myfbclient = new FacebookClient(_token);
             string versio = myfbclient.Version;
             var parameters = new Dictionary<string, object>();
@@ -96,10 +97,15 @@ namespace FB_Connector
             }
 
             var connection = new HubConnectionBuilder()
-            .WithUrl("https://stg.api.ce.fortytwo-ai.com/chatbot") // URL to your SignalR hub
+            .WithUrl("https://stg.api.ce.fortytwo-ai.com/chatbot?access_token=",
+                options =>
+                {
+                    options.SkipNegotiation = true; // Skip negotiation
+                    options.Transports = HttpTransportType.WebSockets; // Use WebSocket transport
+                })
             .Build();
 
-            connection.StartAsync();
+            await connection.StartAsync();
 
             // get conversationays
             int iLoop = 0;
@@ -127,7 +133,7 @@ namespace FB_Connector
                     };
 
                     httpClientRequest.PostRequest("https://stg.api.ce.fortytwo-ai.com/c/Chatbot/addGroup", null, _req.ToSerialize(), null);
-                    connection.InvokeAsync("AddToGroup", _group.senders.data[0].id);
+                    await connection.InvokeAsync("AddToGroup", _group.senders.data[0].id);
 
                     foreach (var _msg in _group.messages.data)
                     {
@@ -136,13 +142,14 @@ namespace FB_Connector
                             DeviceId = _group.senders.data[0].id,
                             Content = _msg.message,
                             MsgType = "MESSAGE",
+                            Command = "/from_bot",
                             UserId = 0,
                             CreatedAt = _msg.created_time
                         };
 
-                        var _resMsg = httpClientRequest.PostRequest<string>($"https://stg.api.ce.fortytwo-ai.com/c/Chatbot/{_reqMsg.DeviceId}/push", null, _reqMsg.ToSerialize(), null);
-                        if (_resMsg.RespMsg == "1")
-                            connection.SendAsync("SendMessage", _reqMsg);
+                        var _resMsg = httpClientRequest.PostRequestString($"https://stg.api.ce.fortytwo-ai.com/c/Chatbot/{_reqMsg.DeviceId}/push", null, _reqMsg.ToSerialize(), null);
+                        if (_resMsg == "1")
+                            await connection.InvokeAsync("SendMessage", _reqMsg.ToSerialize());
                     }
                 }
                 //for (int i = 0; i < conv.data.Count; i++) // tat ca convs
