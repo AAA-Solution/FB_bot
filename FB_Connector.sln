@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.8
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FB_Connector", "FB_Connector\FB_Connector.csproj", "{A3FCE638-68C1-440D-8A4E-CC864252841F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A3FCE638-68C1-440D-8A4E-CC864252841F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3FCE638-68C1-440D-8A4E-CC864252841F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3FCE638-68C1-440D-8A4E-CC864252841F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3FCE638-68C1-440D-8A4E-CC864252841F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {341D3D90-8BB8-4731-B5C2-19CE697AF9DB}
+	EndGlobalSection
+EndGlobal
